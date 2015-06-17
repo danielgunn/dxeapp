@@ -1,6 +1,8 @@
-angular.module('sociogram.controllers', [])
+angular.module('dxe.controllers', [])
 
-    .controller('AppCtrl', function ($scope, $state, OpenFB) {
+    .controller('AppCtrl', function ($scope, $state, OpenFB, $localStorage) {
+
+        $scope.$storage = $localStorage;
 
         $scope.logout = function () {
             OpenFB.logout();
@@ -16,6 +18,12 @@ angular.module('sociogram.controllers', [])
                     alert('Revoke permissions failed');
                 });
         };
+        
+
+        $scope.setChapter = function(cid) {
+            $localStorage.chapter = cid;
+            $state.go('app.chapter-feed', {chapterId: cid});
+        };
 
     })
 
@@ -26,7 +34,7 @@ angular.module('sociogram.controllers', [])
             //OpenFB.login('email,read_stream,publish_actions').then(
             OpenFB.login('read_stream').then(
                 function () {
-                    $location.path('/app/person/me/feed');
+                    $location.path('/app/chapters');
                 },
                 function () {
                     alert('OpenFB login failed');
@@ -35,6 +43,7 @@ angular.module('sociogram.controllers', [])
 
     })
 
+        /*
     .controller('ShareCtrl', function ($scope, OpenFB) {
 
         $scope.item = {};
@@ -50,6 +59,7 @@ angular.module('sociogram.controllers', [])
         };
 
     })
+    */
 
     .controller('ProfileCtrl', function ($scope, OpenFB) {
         OpenFB.get('/me').success(function (user) {
@@ -63,6 +73,7 @@ angular.module('sociogram.controllers', [])
         });
     })
 
+/*
     .controller('FriendsCtrl', function ($scope, $stateParams, OpenFB) {
         OpenFB.get('/' + $stateParams.personId + '/friends', {limit: 50})
             .success(function (result) {
@@ -72,6 +83,7 @@ angular.module('sociogram.controllers', [])
                 alert(data.error.message);
             });
     })
+    */
 
     .controller('ChaptersIndexCtrl', function ($scope, ChapterService) {
         $scope.chapters = ChapterService.all();
@@ -85,6 +97,7 @@ angular.module('sociogram.controllers', [])
 
 
 
+/*
     .controller('MutualFriendsCtrl', function ($scope, $stateParams, OpenFB) {
         OpenFB.get('/' + $stateParams.personId + '/mutualfriends', {limit: 50})
             .success(function (result) {
@@ -94,6 +107,7 @@ angular.module('sociogram.controllers', [])
                 alert(data.error.message);
             });
     })
+    */
 
     .controller('ChapterFeedCtrl', function ($scope, $stateParams, OpenFB, ChapterService, $ionicLoading) {
         $scope.hasChapter = ($stateParams.chapterId != "all");
@@ -142,8 +156,9 @@ angular.module('sociogram.controllers', [])
 
         loadFeed();
 
-    })
+    });
 
+/*
     .controller('FeedCtrl', function ($scope, $stateParams, OpenFB, $ionicLoading) {
 
         $scope.show = function() {
@@ -177,3 +192,4 @@ angular.module('sociogram.controllers', [])
         loadFeed();
 
     });
+    */

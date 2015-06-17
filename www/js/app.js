@@ -1,4 +1,4 @@
-angular.module('sociogram', ['ionic', 'openfb', 'sociogram.controllers', 'sociogram.services'])
+angular.module('dxe', ['ionic', 'openfb', 'dxe.controllers', 'dxe.services', 'ngStorage'])
 
     .run(function ($rootScope, $state, $ionicPlatform, $window, OpenFB) {
 
@@ -11,6 +11,7 @@ angular.module('sociogram', ['ionic', 'openfb', 'sociogram.controllers', 'sociog
             }
         });
 
+        //TODO: why this not working? not tripping on chapter-index
         $rootScope.$on('$stateChangeStart', function(event, toState) {
             if (toState.name !== "app.login" && toState.name !== "app.logout" && !$window.sessionStorage['fbtoken']) {
                 $state.go('app.login');
@@ -44,7 +45,7 @@ angular.module('sociogram', ['ionic', 'openfb', 'sociogram.controllers', 'sociog
                 }
             })
 
-            .state('app.chapter-detail', {
+            .state('app.chapter-feed', {
                 url: '/feed/:chapterId',
                 views: {
                     'menuContent': {
@@ -94,7 +95,9 @@ angular.module('sociogram', ['ionic', 'openfb', 'sociogram.controllers', 'sociog
                         controller: "ProfileCtrl"
                     }
                 }
-            })
+            });
+
+            /*
 
             .state('app.share', {
                 url: "/share",
@@ -142,9 +145,11 @@ angular.module('sociogram', ['ionic', 'openfb', 'sociogram.controllers', 'sociog
                     }
                 }
             });
+            */
 
         // fallback route
-        $urlRouterProvider.otherwise('/app/feed/0');
+        //$urlRouterProvider.otherwise('/app/chapter-index');
+        $urlRouterProvider.otherwise('/app/login');
 
     });
 

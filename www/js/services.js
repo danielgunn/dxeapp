@@ -1,4 +1,4 @@
-angular.module('sociogram.services', [])
+angular.module('dxe.services', [])
 
 .factory('UserService', [function() {
     var sdo = {
