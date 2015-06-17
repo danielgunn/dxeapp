@@ -45,22 +45,22 @@ angular.module('dxe', ['ionic', 'openfb', 'dxe.controllers', 'dxe.services', 'ng
                 }
             })
 
-            .state('app.chapter-feed', {
-                url: '/feed/:chapterId',
+            .state('app.news', {
+                url: '/news/:chapterId',
                 views: {
                     'menuContent': {
-                        templateUrl: 'templates/chapter-feed.html',
-                        controller: 'ChapterFeedCtrl'
+                        templateUrl: 'templates/news.html',
+                        controller: 'NewsCtrl'
                     }
                 }
             })
 
-            .state('app.chapter-actions', {
+            .state('app.actions', {
                 url: '/actions/:chapterId',
                 views: {
                     'menuContent': {
-                        templateUrl: 'templates/chapter-actions.html',
-                        controller: 'ChapterActionsCtrl'
+                        templateUrl: 'templates/actions.html',
+                        controller: 'ActionsCtrl'
                     }
                 }
             })
@@ -95,55 +95,6 @@ angular.module('dxe', ['ionic', 'openfb', 'dxe.controllers', 'dxe.services', 'ng
                 }
             });
 
-            /*
-
-            .state('app.share', {
-                url: "/share",
-                views: {
-                    'menuContent': {
-                        templateUrl: "templates/share.html",
-                        controller: "ShareCtrl"
-                    }
-                }
-            })
-
-            .state('app.friends', {
-                url: "/person/:personId/friends",
-                views: {
-                    'menuContent': {
-                        templateUrl: "templates/friend-list.html",
-                        controller: "FriendsCtrl"
-                    }
-                }
-            })
-            .state('app.mutualfriends', {
-                url: "/person/:personId/mutualfriends",
-                views: {
-                    'menuContent': {
-                        templateUrl: "templates/mutual-friend-list.html",
-                        controller: "MutualFriendsCtrl"
-                    }
-                }
-            })
-            .state('app.person', {
-                url: "/person/:personId",
-                views: {
-                    'menuContent': {
-                        templateUrl: "templates/person.html",
-                        controller: "PersonCtrl"
-                    }
-                }
-            })
-            .state('app.feed', {
-                url: "/person/:personId/feed",
-                views: {
-                    'menuContent': {
-                        templateUrl: "templates/feed.html",
-                        controller: "FeedCtrl"
-                    }
-                }
-            });
-            */
 
         // fallback route
         //$urlRouterProvider.otherwise('/app/chapter-index');

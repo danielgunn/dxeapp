@@ -19,11 +19,11 @@ angular.module('dxe.controllers', [])
                     alert('Revoke permissions failed');
                 });
         };
-        
 
         $scope.setChapter = function(cid) {
             $localStorage.chapter = cid;
-            $state.go('app.chapter-feed', {chapterId: cid});
+            console.debug("DXE chapterId set to " + $localStorage.chapter);
+            $state.go('app.news', {chapterId: cid});
         };
 
     })
@@ -38,7 +38,7 @@ angular.module('dxe.controllers', [])
                     if ($localStorage.chapter == null) {
                         $location.path('/app/chapters');
                     } else {
-                        $location.path('/app/feed/' + $localStorage.chapter);
+                        $location.path('/app/news/' + $localStorage.chapter);
                     }
                 },
                 function () {
@@ -72,13 +72,13 @@ angular.module('dxe.controllers', [])
         });
     })
 
+/*
     .controller('PersonCtrl', function ($scope, $stateParams, OpenFB) {
         OpenFB.get('/' + $stateParams.personId).success(function (user) {
             $scope.user = user;
         });
     })
 
-/*
     .controller('FriendsCtrl', function ($scope, $stateParams, OpenFB) {
         OpenFB.get('/' + $stateParams.personId + '/friends', {limit: 50})
             .success(function (result) {
@@ -91,15 +91,18 @@ angular.module('dxe.controllers', [])
     */
 
     .controller('ChaptersIndexCtrl', function ($scope, ChapterService) {
+        //delete $localStorage.chapter;
         $scope.chapters = ChapterService.all();
     })
 
+/*
     // A simple controller that shows a tapped item's data
-    .controller('ChapterDetailCtrl', function($scope, $stateParams, ChapterService) {
+    .controller('ChapterDetailCtrl', function($scope, $stateParams, ChapterService, $localStorage) {
         // "Chapters" is a service returning mock data (services.js)
-        $scope.chapter = ChapterService.get($stateParams.chapterId);
+        $scope.chapter = ChapterService.get($localStorage.chapter);
     })
 
+    */
 
 
 /*
@@ -114,13 +117,18 @@ angular.module('dxe.controllers', [])
     })
     */
 
-    .controller('ChapterActionsCtrl', function ($scope, $stateParams, OpenFB, ChapterService, $ionicLoading) {
+    // TODO: fix the following error messages:
+    // E/Web Console( 8390): $ionicLoading instance.hide() has been deprecated. Use $ionicLoading.hide().:20306
 
-        if ($stateParams.chapterId == null) {
-            console.error("chapterId is null");
+    .controller('ActionsCtrl', function ($scope, $stateParams, OpenFB, ChapterService, $localStorage, $ionicLoading) {
+
+        if ($localStorage.chapter == null) {
+            console.error("DXE chapterId is null");
+        } else {
+            console.debug("DXE chapterId is " + $localStorage.chapter);
         }
 
-        $scope.chapter = ChapterService.get($stateParams.chapterId);
+        $scope.chapter = ChapterService.get($localStorage.chapter);
 
         $scope.show = function() {
             $scope.loading = $ionicLoading.show({
@@ -155,13 +163,15 @@ angular.module('dxe.controllers', [])
 
     })
 
-    .controller('ChapterFeedCtrl', function ($scope, $stateParams, OpenFB, ChapterService, $ionicLoading) {
+    .controller('NewsCtrl', function ($scope, $stateParams, OpenFB, ChapterService, $localStorage, $ionicLoading) {
 
-        if ($stateParams.chapterId == null) {
-            console.error("chapterId is null");
+        if ($localStorage.chapter == null) {
+            console.error("DXE chapterId is null");
+        } else {
+            console.debug("DXE chapterId is " + $localStorage.chapter);
         }
 
-        $scope.chapter = ChapterService.get($stateParams.chapterId);
+        $scope.chapter = ChapterService.get($localStorage.chapter);
 
         $scope.show = function() {
             $scope.loading = $ionicLoading.show({
@@ -195,39 +205,3 @@ angular.module('dxe.controllers', [])
         loadFeed();
 
     });
-
-/*
-    .controller('FeedCtrl', function ($scope, $stateParams, OpenFB, $ionicLoading) {
-
-        $scope.show = function() {
-            $scope.loading = $ionicLoading.show({
-                content: 'Loading feed...'
-            });
-        };
-        $scope.hide = function(){
-            $scope.loading.hide();
-        };
-
-        function loadFeed() {
-            $scope.show();
-            //TODO: broke this for DXE
-            //OpenFB.get('/' + $stateParams.personId + '/home', {limit: 30})
-            OpenFB.get('/' + $stateParams.personId + '/home', {limit: 30})
-                .success(function (result) {
-                    $scope.hide();
-                    $scope.items = result.data;
-                    // Used with pull-to-refresh
-                    $scope.$broadcast('scroll.refreshComplete');
-                })
-                .error(function(data) {
-                    $scope.hide();
-                    alert(data.error.message);
-                });
-        }
-
-        $scope.doRefresh = loadFeed;
-
-        loadFeed();
-
-    });
-    */
