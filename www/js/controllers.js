@@ -5,6 +5,7 @@ angular.module('dxe.controllers', [])
         $scope.$storage = $localStorage;
 
         $scope.logout = function () {
+            delete $localStorage.chapter;
             OpenFB.logout();
             $state.go('app.login');
         };
@@ -27,14 +28,18 @@ angular.module('dxe.controllers', [])
 
     })
 
-    .controller('LoginCtrl', function ($scope, $location, OpenFB) {
+    .controller('LoginCtrl', function ($scope, $location, OpenFB, $localStorage) {
 
         $scope.facebookLogin = function () {
 
             //OpenFB.login('email,read_stream,publish_actions').then(
             OpenFB.login('read_stream').then(
                 function () {
-                    $location.path('/app/chapters');
+                    if ($localStorage.chapter == null) {
+                        $location.path('/app/chapters');
+                    } else {
+                        $location.path('/app/feed/' + $localStorage.chapter);
+                    }
                 },
                 function () {
                     alert('OpenFB login failed');
@@ -110,14 +115,12 @@ angular.module('dxe.controllers', [])
     */
 
     .controller('ChapterFeedCtrl', function ($scope, $stateParams, OpenFB, ChapterService, $ionicLoading) {
-        $scope.hasChapter = ($stateParams.chapterId != "all");
 
-        if ($scope.hasChapter) {
-            $scope.chapter = ChapterService.get($stateParams.chapterId);
-        } else {
-            $scope.chapter = { title: 'All locations', description: 'All chapters' };
+        if ($stateParams.chapterId == null) {
+            console.error("chapterId is null");
         }
 
+        $scope.chapter = ChapterService.get($stateParams.chapterId);
 
         $scope.show = function() {
             $scope.loading = $ionicLoading.show({
@@ -130,17 +133,11 @@ angular.module('dxe.controllers', [])
 
         function loadFeed() {
             $scope.show();
-            var fburl = "";
-            if ($scope.hasChapter) {
-                fburl = '/' + $scope.chapter.fbid + '/feed';
-            } else {
-                fburl = '/feed?ids=515856298444724,1544022332487853,621335794581141,1612669425619347';
-            } 
+            var fburl = '/' + $scope.chapter.fbid + '/feed';
             OpenFB.get(fburl, {limit: 30})
                 .success(function (result) {
                     $scope.hide();
                     $scope.items = result.data;
-                    console.debug("feed: " + result.data);
                     // Used with pull-to-refresh
                     $scope.$broadcast('scroll.refreshComplete');
                 })
