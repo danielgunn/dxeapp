@@ -13,17 +13,9 @@
 
         <div ng-repeat="item in items" class="list card">
             <div class="item item-avatar">
-                <img src="https://graph.facebook.com/{{ item.from.id }}/picture"/>
-                <h2>{{item.from.name}}</h2>
-                <p>{{item.created_time | date:'MMM d, y h:mma'}}</p>
-            </div>
-            <div class="item item-body">
-                <p ng-if="item.story">{{item.story}}</p>
-
-                <p>{{item.message}}</p>
-
-                <img ng-if="item.picture" ng-src="{{ item.picture }}"/>
-
+                <!--<img src="https://graph.facebook.com/{{ item.from.id }}/picture"/>-->
+                <h2>{{item.name}}</h2>
+                <p>{{item.start_time | date:'MMM d, y h:mma'}}</p>
             </div>
         </div>
 

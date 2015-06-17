@@ -55,7 +55,6 @@ angular.module('dxe', ['ionic', 'openfb', 'dxe.controllers', 'dxe.services', 'ng
                 }
             })
 
-            /*
             .state('app.chapter-actions', {
                 url: '/actions/:chapterId',
                 views: {
@@ -65,7 +64,6 @@ angular.module('dxe', ['ionic', 'openfb', 'dxe.controllers', 'dxe.services', 'ng
                     }
                 }
             })
-            */
 
             .state('app.login', {
                 url: "/login",

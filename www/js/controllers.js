@@ -114,6 +114,47 @@ angular.module('dxe.controllers', [])
     })
     */
 
+    .controller('ChapterActionsCtrl', function ($scope, $stateParams, OpenFB, ChapterService, $ionicLoading) {
+
+        if ($stateParams.chapterId == null) {
+            console.error("chapterId is null");
+        }
+
+        $scope.chapter = ChapterService.get($stateParams.chapterId);
+
+        $scope.show = function() {
+            $scope.loading = $ionicLoading.show({
+                content: 'Loading actions...'
+            });
+        };
+        $scope.hide = function(){
+            $scope.loading.hide();
+        };
+
+        function loadFeed() {
+            $scope.show();
+            var fburl = '/' + $scope.chapter.fbid + '/events';
+            OpenFB.get(fburl, {limit: 30})
+                .success(function (result) {
+                    $scope.hide();
+                    $scope.items = result.data;
+                    // Used with pull-to-refresh
+                    $scope.$broadcast('scroll.refreshComplete');
+                })
+                .error(function(data) {
+                    $scope.hide();
+                    console.error("fburl: " + fburl);
+                    console.error(data.error.message);
+                    alert(data.error.message);
+                });
+        }
+
+        $scope.doRefresh = loadFeed;
+
+        loadFeed();
+
+    })
+
     .controller('ChapterFeedCtrl', function ($scope, $stateParams, OpenFB, ChapterService, $ionicLoading) {
 
         if ($stateParams.chapterId == null) {
