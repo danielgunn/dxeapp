@@ -27,10 +27,20 @@
             </div>
         </div>
     </ion-content>
-    <div class="bar bar-footer bar-light">
-        <div class="title" ng-click="launchWall({{chapter.fbid}})">
-            <i class="icon ion-social-facebook"></i>
-            &nbsp;View Wall in Facebook
-        </div>
+    <div class="tabs-striped tabs-color-assertive">
+    <div class="tabs">
+            <a class="tab-item" ng-click="launchWall({{chapter.fbid}})">
+                <i class="icon ion-social-facebook"></i>
+                Facebook
+            </a>
+            <a class="tab-item" href="#/app/actions/{{$storage.chapter}}">
+                <i class="icon ion-jet"></i>
+                Actions
+            </a>
+            <a class="tab-item active" href="#/app/news/{{$storage.chapter}}">
+                <i class="icon ion-radio-waves"></i>
+                News
+            </a>
     </div>
+  </div>
 </ion-view>

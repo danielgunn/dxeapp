@@ -10,6 +10,10 @@ angular.module('dxe.controllers', [])
             $state.go('app.login');
         };
 
+        $scope.launchWall = function(fbid) {
+            window.open("https://www.facebook.com/" + fbid + "/", '_blank', 'location=no');
+        };
+
         $scope.revokePermissions = function () {
             OpenFB.revokePermissions().then(
                 function () {
@@ -185,11 +189,6 @@ angular.module('dxe.controllers', [])
         $scope.hide = function(){
             $scope.loading.hide();
         };
-
-        $scope.launchWall = function(fbid) {
-            window.open("https://www.facebook.com/" + fbid + "/", '_blank', 'location=no');
-        };
-
 
         function loadFeed() {
             $scope.show();
