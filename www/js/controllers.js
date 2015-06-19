@@ -139,9 +139,13 @@ angular.module('dxe.controllers', [])
             $scope.loading.hide();
         };
 
+        $scope.launchEvent = function(eid) {
+            window.open("https://www.facebook.com/events/" + eid + "/", '_blank', 'location=no');
+        };
+
         function loadFeed() {
             $scope.show();
-            var fburl = '/' + $scope.chapter.fbid + '/events';
+            var fburl = '/' + $scope.chapter.fbid + '/events?fields=cover,description,name';
             OpenFB.get(fburl, {limit: 30})
                 .success(function (result) {
                     $scope.hide();
@@ -181,6 +185,11 @@ angular.module('dxe.controllers', [])
         $scope.hide = function(){
             $scope.loading.hide();
         };
+
+        $scope.launchWall = function(fbid) {
+            window.open("https://www.facebook.com/" + fbid + "/", '_blank', 'location=no');
+        };
+
 
         function loadFeed() {
             $scope.show();

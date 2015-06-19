@@ -11,3 +11,9 @@
     margin-top: 0;
     margin-bottom: 4px;
 }
+
+.myfooter {
+    position:fixed;
+    bottom:5%;
+    height:50px;
+}

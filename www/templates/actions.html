@@ -12,10 +12,17 @@
         </ion-refresher>
 
         <div ng-repeat="item in items" class="list card">
-            <div class="item item-avatar">
-                <img src="https://graph.facebook.com/{{ item.id }}/picture"/>
-                <h2>{{item.name}}</h2>
-                <p>{{item.start_time | date:'MMM d, y h:mma'}}</p>
+            <div class="bar bar-header">
+                <h1 class="title">{{item.name}}</h1>
+            </div>
+            <div class="item item-body">
+                <img class="full-image" src="{{item.cover.source}}"/>
+				<h2>{{item.start_time | date:'MMM d, y h:mma'}}</h2>
+                <pre> {{item.description | limitTo: 200 }} {{item.description.length > 200 ? '...' : ''}}</pre>
+                <button class="button button-block button-light" ng-click="launchEvent({{item.id}})">
+                    <i class="icon ion-social-facebook"></i>
+                    &nbsp;View in Facebook
+                </button>
             </div>
         </div>
 
