@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="com.directactioneverywhere.app" version="0.0.3" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.directactioneverywhere.app" version="0.0.3" 
+    xmlns="http://www.w3.org/ns/widgets" 
+    xmlns:gap = "http://phonegap.com/ns/1.0"
+    xmlns:android = "http://schemas.android.com/apk/res/android"
+    xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>Direct Action Everywhere</name>
   <description>
         Until Every Animal is Free
