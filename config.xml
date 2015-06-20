@@ -40,4 +40,5 @@
     <splash src="resources/android/splash/drawable-port-xxxhdpi-screen.png" density="port-xxxhdpi"/>
   </platform>
   <icon src="resources/android/icon/drawable-xhdpi-icon.png"/>
+  <gap:plugin name="org.apache.cordova.inappbrowser" />
 </widget>
