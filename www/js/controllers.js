@@ -161,11 +161,10 @@ angular.module('dxe.controllers', ['ngOpenFB'])
 
         function loadFeed() {
             $scope.show();
-            var fburl = '/' + $scope.chapter.fbid + '/feed';
 
             ngFB.api({
                 method: 'GET',
-                path: '/' + $scope.chapter.fbid + '/feed',
+                path: '/' + $scope.chapter.fbid + '/posts',
                 params: {limit: 30}}
             ).then(
                 function(result) {
@@ -176,7 +175,6 @@ angular.module('dxe.controllers', ['ngOpenFB'])
                 },
                 function (error) {
                     $scope.hide();
-                    console.error("fburl: " + fburl);
                     console.error(JSON.stringify(error));
                     alert(error.message);
                 });
