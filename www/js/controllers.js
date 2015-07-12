@@ -86,9 +86,6 @@ angular.module('dxe.controllers', ['ngOpenFB'])
         $scope.chapters = ChapterService.all();
     })
 
-    // TODO: fix the following error messages:
-    // E/Web Console( 8390): $ionicLoading instance.hide() has been deprecated. Use $ionicLoading.hide().:20306
-
     .controller('ActionsCtrl', function ($scope, $stateParams, ngFB, ChapterService, $localStorage, $ionicLoading) {
 
         if ($localStorage.chapter == null) {
@@ -105,7 +102,7 @@ angular.module('dxe.controllers', ['ngOpenFB'])
             });
         };
         $scope.hide = function(){
-            $scope.loading.hide();
+            $ionicLoading.hide();
         };
 
         $scope.launchEvent = function(eid) {
@@ -156,7 +153,7 @@ angular.module('dxe.controllers', ['ngOpenFB'])
             });
         };
         $scope.hide = function(){
-            $scope.loading.hide();
+            $ionicLoading.hide();
         };
 
         function loadFeed() {
