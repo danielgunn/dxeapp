@@ -23,7 +23,7 @@ angular.module('dxe.controllers', ['ngOpenFB'])
         };
 
         $scope.revokePermissions = function () {
-            OpenFB.revokePermissions().then(
+            ngFB.revokePermissions().then(
                 function () {
                     $state.go('app.login');
                 },
@@ -45,7 +45,7 @@ angular.module('dxe.controllers', ['ngOpenFB'])
 
         $scope.facebookLogin = function () {
 
-            ngFB.login({scope: 'read_stream'}).then(
+            ngFB.login({scope: 'public_profile'}).then(
                 function (response) {
                     if (response.status === 'connected') {
                         console.log('Facebook login succeeded');
@@ -125,6 +125,9 @@ angular.module('dxe.controllers', ['ngOpenFB'])
                     $scope.$broadcast('scroll.refreshComplete');
                 },
                 function (error) {
+                    //TODO: handle session expiry??
+                    //example:
+                    //{"message":"Error validating access token: Session has expired on Sunday, 12-Jul-15 02:00:00 PDT. The current time is Sunday, 12-Jul-15 02:03:48 PDT.","type":"OAuthException","code":190,"error_subcode":463}(anonymous function) @ controllers.js:175processQueue @ ionic.bundle.js:21888(anonymous function) @ ionic.bundle.js:21904$get.Scope.$eval @ ionic.bundle.js:23100$get.Scope.$digest @ ionic.bundle.js:22916(anonymous function) @ ionic.bundle.js:23139completeOutstandingRequest @ ionic.bundle.js:13604(anonymous function) @ ionic.bundle.js:13984
                     $scope.hide();
                     console.error(JSON.stringify(error));
                     alert(error.message);
