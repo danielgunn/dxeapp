@@ -16,7 +16,7 @@
                 <h1 class="title">{{item.name}}</h1>
             </div>
             <div class="item item-body">
-                <img class="full-image" src="{{item.cover.source}}"/>
+                <img class="full-image" ng-src="{{item.cover.source}}"/>
 				<h2>{{item.start_time | date:'MMM d, y h:mma'}}</h2>
                 <pre> {{item.description | limitTo: 200 }} {{item.description.length > 200 ? '...' : ''}}</pre>
                 <button class="button button-block button-light" ng-click="launchEvent({{item.id}})">

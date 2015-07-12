@@ -1,9 +1,8 @@
-angular.module('dxe', ['ionic', 'openfb', 'dxe.controllers', 'dxe.services', 'ngStorage'])
+angular.module('dxe', ['ionic', 'ngOpenFB', 'dxe.controllers', 'dxe.services', 'ngStorage'])
 
-    .run(function ($rootScope, $state, $ionicPlatform, $window, OpenFB) {
+    .run(function ($rootScope, $state, $ionicPlatform, $window, ngFB) {
 
-        //OpenFB.init('YOUR_FB_APP_ID');
-        OpenFB.init('630915116944951');
+        ngFB.init({appId: '630915116944951'});
 
         $ionicPlatform.ready(function () {
             if (window.StatusBar) {
@@ -13,7 +12,7 @@ angular.module('dxe', ['ionic', 'openfb', 'dxe.controllers', 'dxe.services', 'ng
 
         //TODO: why this not working? not tripping on chapter-index
         $rootScope.$on('$stateChangeStart', function(event, toState) {
-            if (toState.name !== "app.login" && toState.name !== "app.logout" && !$window.sessionStorage['fbtoken']) {
+            if (toState.name !== "app.login" && toState.name !== "app.logout" && !$window.sessionStorage['fbAccessToken']) {
                 $state.go('app.login');
                 event.preventDefault();
             }

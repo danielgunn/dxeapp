@@ -1,12 +1,20 @@
-angular.module('dxe.controllers', [])
+angular.module('dxe.controllers', ['ngOpenFB'])
 
-    .controller('AppCtrl', function ($scope, $state, OpenFB, $localStorage) {
+    .controller('AppCtrl', function ($scope, $state, ngFB, $localStorage) {
 
         $scope.$storage = $localStorage;
 
         $scope.logout = function () {
+            console.log("logging out");
             delete $localStorage.chapter;
-            OpenFB.logout();
+            ngFB.logout().then(
+                function(){
+                    console.debug("logged out");
+                },
+                function(error) {
+                    console.error(JSON.stringify(error));
+                    alert(error);
+                });
             $state.go('app.login');
         };
 
@@ -20,6 +28,7 @@ angular.module('dxe.controllers', [])
                     $state.go('app.login');
                 },
                 function () {
+                    console.error("revoke permissions failed");
                     alert('Revoke permissions failed');
                 });
         };
@@ -32,99 +41,55 @@ angular.module('dxe.controllers', [])
 
     })
 
-    .controller('LoginCtrl', function ($scope, $location, OpenFB, $localStorage) {
+    .controller('LoginCtrl', function ($scope, $state, $window, ngFB, $localStorage) {
 
         $scope.facebookLogin = function () {
 
-            //OpenFB.login('email,read_stream,publish_actions').then(
-            OpenFB.login('read_stream').then(
-                function () {
-                    if ($localStorage.chapter == null) {
-                        $location.path('/app/chapters');
+            ngFB.login({scope: 'read_stream'}).then(
+                function (response) {
+                    if (response.status === 'connected') {
+                        console.log('Facebook login succeeded');
+                        if ($localStorage.chapter == null) {
+                            $state.go('app.chapter-index');
+                            //$location.path('/app/chapters');
+                        } else {
+                            //$location.path('/app/news/' + $localStorage.chapter);
+                            $state.go('app.news', {chapterId: $localStorage.chapter});
+                        }
+                       if (!$window.sessionStorage['fbAccessToken']) {
+                           throw "fbtoken not found after login" || "Assertion failure";
+                       }
                     } else {
-                        $location.path('/app/news/' + $localStorage.chapter);
+                        console.error('Facebook login succeeded');
+                        alert('Facebook login failed');
                     }
-                },
-                function () {
-                    alert('OpenFB login failed');
                 });
         };
 
+        console.log('logining');
     })
 
-        /*
-    .controller('ShareCtrl', function ($scope, OpenFB) {
-
-        $scope.item = {};
-
-        $scope.share = function () {
-            OpenFB.post('/me/feed', $scope.item)
-                .success(function () {
-                    $scope.status = "This item has been shared on OpenFB";
-                })
-                .error(function(data) {
-                    alert(data.error.message);
-                });
-        };
-
-    })
-    */
-
-    .controller('ProfileCtrl', function ($scope, OpenFB) {
-        OpenFB.get('/me').success(function (user) {
-            $scope.user = user;
-        });
-    })
-
-/*
-    .controller('PersonCtrl', function ($scope, $stateParams, OpenFB) {
-        OpenFB.get('/' + $stateParams.personId).success(function (user) {
-            $scope.user = user;
-        });
-    })
-
-    .controller('FriendsCtrl', function ($scope, $stateParams, OpenFB) {
-        OpenFB.get('/' + $stateParams.personId + '/friends', {limit: 50})
-            .success(function (result) {
-                $scope.friends = result.data;
-            })
-            .error(function(data) {
-                alert(data.error.message);
+    .controller('ProfileCtrl', function ($scope, ngFB) {
+        ngFB.get({path: '/me'}).then(
+            function (user) {
+                console.log(JSON.stringify(user));
+                $scope.user = user;
+            },
+            function (error) {
+                console.error(error.message);
+                alert(error.message);
             });
     })
-    */
 
     .controller('ChaptersIndexCtrl', function ($scope, ChapterService) {
         //delete $localStorage.chapter;
         $scope.chapters = ChapterService.all();
     })
 
-/*
-    // A simple controller that shows a tapped item's data
-    .controller('ChapterDetailCtrl', function($scope, $stateParams, ChapterService, $localStorage) {
-        // "Chapters" is a service returning mock data (services.js)
-        $scope.chapter = ChapterService.get($localStorage.chapter);
-    })
-
-    */
-
-
-/*
-    .controller('MutualFriendsCtrl', function ($scope, $stateParams, OpenFB) {
-        OpenFB.get('/' + $stateParams.personId + '/mutualfriends', {limit: 50})
-            .success(function (result) {
-                $scope.friends = result.data;
-            })
-            .error(function(data) {
-                alert(data.error.message);
-            });
-    })
-    */
-
     // TODO: fix the following error messages:
     // E/Web Console( 8390): $ionicLoading instance.hide() has been deprecated. Use $ionicLoading.hide().:20306
 
-    .controller('ActionsCtrl', function ($scope, $stateParams, OpenFB, ChapterService, $localStorage, $ionicLoading) {
+    .controller('ActionsCtrl', function ($scope, $stateParams, ngFB, ChapterService, $localStorage, $ionicLoading) {
 
         if ($localStorage.chapter == null) {
             console.error("DXE chapterId is null");
@@ -147,21 +112,25 @@ angular.module('dxe.controllers', [])
             window.open("https://www.facebook.com/events/" + eid + "/", '_blank', 'location=no');
         };
 
+        //TODO: just saw ngFB.getLoginStatus.. should use it
+
         function loadFeed() {
             $scope.show();
-            var fburl = '/' + $scope.chapter.fbid + '/events?fields=cover,description,name';
-            OpenFB.get(fburl, {limit: 30})
-                .success(function (result) {
+
+            ngFB.api({
+                method: 'GET',
+                path: '/' + $scope.chapter.fbid + '/events',
+                params: {fields: "cover, description, name", limit: 30}}).then(
+                function(result) {
                     $scope.hide();
                     $scope.items = result.data;
                     // Used with pull-to-refresh
                     $scope.$broadcast('scroll.refreshComplete');
-                })
-                .error(function(data) {
+                },
+                function (error) {
                     $scope.hide();
-                    console.error("fburl: " + fburl);
-                    console.error(data.error.message);
-                    alert(data.error.message);
+                    console.error(JSON.stringify(error));
+                    alert(error.message);
                 });
         }
 
@@ -171,7 +140,7 @@ angular.module('dxe.controllers', [])
 
     })
 
-    .controller('NewsCtrl', function ($scope, $stateParams, OpenFB, ChapterService, $localStorage, $ionicLoading) {
+    .controller('NewsCtrl', function ($scope, $stateParams, ngFB, ChapterService, $localStorage, $ionicLoading) {
 
         if ($localStorage.chapter == null) {
             console.error("DXE chapterId is null");
@@ -193,19 +162,25 @@ angular.module('dxe.controllers', [])
         function loadFeed() {
             $scope.show();
             var fburl = '/' + $scope.chapter.fbid + '/feed';
-            OpenFB.get(fburl, {limit: 30})
-                .success(function (result) {
+
+            ngFB.api({
+                method: 'GET',
+                path: '/' + $scope.chapter.fbid + '/feed',
+                params: {limit: 30}}
+            ).then(
+                function(result) {
                     $scope.hide();
                     $scope.items = result.data;
                     // Used with pull-to-refresh
                     $scope.$broadcast('scroll.refreshComplete');
-                })
-                .error(function(data) {
+                },
+                function (error) {
                     $scope.hide();
                     console.error("fburl: " + fburl);
-                    console.error(data.error.message);
-                    alert(data.error.message);
+                    console.error(JSON.stringify(error));
+                    alert(error.message);
                 });
+
         }
 
         $scope.doRefresh = loadFeed;
