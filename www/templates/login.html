@@ -1,21 +1,29 @@
 <ion-view title="Direct Action Everywhere" hide-back-button="true" style="background: #1b5a83" hide-nav-bar="true">
 
-    <ion-content has-header="true" padding="true">
+    <style>
+        .login-banner {
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-        <div class="list list-inset"  style="background: #1b5a83">
+        .login {
+            background: url('http://static1.squarespace.com/static/515cca87e4b0bca14d767b61/t/558507f7e4b0e005863e8da8/1435730597775/Forum_SF_1_cropped.jpg"') no-repeat center;
+        }
+    </style>
 
-            <div class="item item-image" style="border:none;margin-top:50px;">
-                <img src="img/icon.png"/>
-            </div>
+    <ion-header-bar class="bar bar-header" style="height:66px;">
+    <img class="login-banner" src="http://static1.squarespace.com/static/515cca87e4b0bca14d767b61/t/52dc7521e4b0a28390e85323/1436825111868/?format=400w">
+    </ion-header-bar>
 
-            <button class="button button-block button-light" ng-click="facebookLogin()">
-                <i class="icon ion-social-facebook"></i>
-                &nbsp;Login with Facebook
-            </button>
-
-
-        </div>
-
+    <ion-content class="login" has-header="true" padding="true">
     </ion-content>
+
+    <div class="tabs tabs-color-assertive" style="height:66px;">
+        <button class="button button-block button-light" ng-click="facebookLogin()">
+            <i class="icon ion-social-facebook"></i>
+            &nbsp;Login with Facebook
+            <br>
+        </button>
+    </div>
 
 </ion-view>

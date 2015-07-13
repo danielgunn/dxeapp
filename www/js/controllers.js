@@ -41,44 +41,40 @@ angular.module('dxe.controllers', ['ngOpenFB'])
 
     })
 
-    .controller('LoginCtrl', function ($scope, $state, $window, ngFB, $localStorage) {
+    .controller('LoginCtrl', function ($scope, $state, $window, ngFB, $localStorage, $ionicSideMenuDelegate) {
+
+        var drag = $ionicSideMenuDelegate.canDragContent(false);
+        if (drag) {
+            console.error(drag);
+        }
 
         $scope.facebookLogin = function () {
 
             ngFB.login({scope: 'public_profile'}).then(
                 function (response) {
+                    var drag = 0;
                     if (response.status === 'connected') {
                         console.log('Facebook login succeeded');
+                        drag = $ionicSideMenuDelegate.canDragContent(true);
+                        if (!drag) {
+                            console.error(drag);
+                        }
                         if ($localStorage.chapter == null) {
                             $state.go('app.chapter-index');
-                            //$location.path('/app/chapters');
                         } else {
-                            //$location.path('/app/news/' + $localStorage.chapter);
                             $state.go('app.news', {chapterId: $localStorage.chapter});
                         }
                        if (!$window.sessionStorage['fbAccessToken']) {
                            throw "fbtoken not found after login" || "Assertion failure";
                        }
                     } else {
-                        console.error('Facebook login succeeded');
+                        console.error('Facebook login failed: ' + JSON.stringify(response));
                         alert('Facebook login failed');
                     }
                 });
         };
 
         console.log('logining');
-    })
-
-    .controller('ProfileCtrl', function ($scope, ngFB) {
-        ngFB.get({path: '/me'}).then(
-            function (user) {
-                console.log(JSON.stringify(user));
-                $scope.user = user;
-            },
-            function (error) {
-                console.error(error.message);
-                alert(error.message);
-            });
     })
 
     .controller('ChaptersIndexCtrl', function ($scope, ChapterService) {
