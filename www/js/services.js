@@ -1,13 +1,5 @@
 angular.module('dxe.services', [])
 
-.factory('UserService', [function() {
-    var sdo = {
-        isLogged: false,
-        username: ''
-    };
-    return sdo;
-}])
-
 /**
  * A simple example service that returns some data.
  */

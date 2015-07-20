@@ -14,10 +14,11 @@
     "gulp-util": "^2.2.14",
     "shelljs": "^0.3.0"
   },
-  "cordovaPlugins": [
-    "org.apache.cordova.inappbrowser"
-  ],
+  "cordovaPlugins": [],
   "cordovaPlatforms": [
-    "android"
+    {
+      "platform": "android",
+      "locator": "browser"
+    }
   ]
 }

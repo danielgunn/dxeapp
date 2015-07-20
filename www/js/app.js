@@ -1,8 +1,6 @@
-angular.module('dxe', ['ionic', 'ngOpenFB', 'dxe.controllers', 'dxe.services', 'ngStorage'])
+angular.module('dxe', ['ionic', 'dxe.controllers', 'dxe.services', 'ngStorage'])
 
-    .run(function ($rootScope, $state, $ionicPlatform, $window, ngFB) {
-
-        ngFB.init({appId: '630915116944951'});
+    .run(function ($rootScope, $state, $ionicPlatform) {
 
         $ionicPlatform.ready(function () {
             if (window.StatusBar) {
@@ -10,21 +8,19 @@ angular.module('dxe', ['ionic', 'ngOpenFB', 'dxe.controllers', 'dxe.services', '
             }
         });
 
-        //TODO: why this not working? not tripping on chapter-index
-        $rootScope.$on('$stateChangeStart', function(event, toState) {
-            if (toState.name !== "app.login" && toState.name !== "app.logout" && !$window.sessionStorage['fbAccessToken']) {
-                $state.go('app.login');
+        // UI Router Authentication Check
+        $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
+            if (toState.name !== "app.login" && toState.name !== "app.logout" && !Parse.User.current()) {
+                // User isn’t authenticated
+                $state.transitionTo("app.login");
                 event.preventDefault();
             }
         });
-
-        $rootScope.$on('OAuthException', function() {
-            $state.go('app.login');
-        });
-
     })
 
     .config(function ($stateProvider, $urlRouterProvider) {
+
+
         $stateProvider
 
             .state('app', {

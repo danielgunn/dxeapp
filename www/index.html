@@ -6,21 +6,27 @@
     <title>Direct Action Everywhere</title>
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
     <link href="css/app.css" rel="stylesheet">
+
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+    <script src="cordova.js"></script>
+
+    <script src="lib/parse/parse.js"></script>
+    <script>
+        Parse.initialize("yq5bBWT3LJlzRkqLKdzOs4jbltFtGnfoWDyqZQjb", "teLE0ov4wcFPHzy3NuQd9k9SnNJrFKgO3O1S1kQN");
+    </script>
+
+    <script src="lib/ngstorage/ngStorage.js"></script>
+
+    <script src="js/app.js"></script>
+    <script src="js/services.js"></script>
+    <script src="js/controllers.js"></script>
 </head>
 
 <body ng-app="dxe">
 
-<ion-nav-view id="main"></ion-nav-view>
+    <ion-nav-view id="main"></ion-nav-view>
+    <div id="fb-root"></div>
 
-<script src="lib/ionic/js/ionic.bundle.js"></script>
-<script src="cordova.js"></script>
-<script src="lib/ngstorage/ngStorage.js"></script>
-<script src="lib/openfb/openfb.js"></script>
-<script src="lib/openfb/ngopenfb.js"></script>
-
-<script src="js/app.js"></script>
-<script src="js/services.js"></script>
-<script src="js/controllers.js"></script>
-
+    <script src='lib/facebook-connect-plugin/index.js'></script>
 </body>
 </html>

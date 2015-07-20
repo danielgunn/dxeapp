@@ -1,36 +1,18 @@
-angular.module('dxe.controllers', ['ngOpenFB'])
+angular.module('dxe.controllers', [])
 
-    .controller('AppCtrl', function ($scope, $state, ngFB, $localStorage) {
+    .controller('AppCtrl', function ($scope, $state, $localStorage) {
 
         $scope.$storage = $localStorage;
 
         $scope.logout = function () {
             console.log("logging out");
             delete $localStorage.chapter;
-            ngFB.logout().then(
-                function(){
-                    console.debug("logged out");
-                },
-                function(error) {
-                    console.error(JSON.stringify(error));
-                    alert(error);
-                });
+            Parse.User.logOut();
             $state.go('app.login');
         };
 
         $scope.launchWall = function(fbid) {
             window.open("https://www.facebook.com/" + fbid + "/", '_blank', 'location=no');
-        };
-
-        $scope.revokePermissions = function () {
-            ngFB.revokePermissions().then(
-                function () {
-                    $state.go('app.login');
-                },
-                function () {
-                    console.error("revoke permissions failed");
-                    alert('Revoke permissions failed');
-                });
         };
 
         $scope.setChapter = function(cid) {
@@ -41,40 +23,69 @@ angular.module('dxe.controllers', ['ngOpenFB'])
 
     })
 
-    .controller('LoginCtrl', function ($scope, $state, $window, ngFB, $localStorage, $ionicSideMenuDelegate) {
+    .controller('LoginCtrl', function ($scope, $state, $localStorage, $ionicSideMenuDelegate ) {
 
         var drag = $ionicSideMenuDelegate.canDragContent(false);
         if (drag) {
             console.error(drag);
         }
 
-        $scope.facebookLogin = function () {
+        var fbLogged = new Parse.Promise();
 
-            ngFB.login({scope: 'public_profile'}).then(
-                function (response) {
-                    var drag = 0;
-                    if (response.status === 'connected') {
-                        console.log('Facebook login succeeded');
-                        drag = $ionicSideMenuDelegate.canDragContent(true);
-                        if (!drag) {
-                            console.error(drag);
-                        }
-                        if ($localStorage.chapter == null) {
-                            $state.go('app.chapter-index');
-                        } else {
-                            $state.go('app.news', {chapterId: $localStorage.chapter});
-                        }
-                       if (!$window.sessionStorage['fbAccessToken']) {
-                           throw "fbtoken not found after login" || "Assertion failure";
-                       }
-                    } else {
-                        console.error('Facebook login failed: ' + JSON.stringify(response));
-                        alert('Facebook login failed');
-                    }
-                });
+        var fbLoginSuccess = function(response) {
+            if (!response.authResponse){
+                fbLoginError("Cannot find the authResponse");
+                return;
+            }
+            var expDate = new Date(
+                new Date().getTime() + response.authResponse.expiresIn * 1000
+                ).toISOString();
+
+            var authData = {
+                id: String(response.authResponse.userID),
+                access_token: response.authResponse.accessToken,
+                expiration_date: expDate
+            }
+            fbLogged.resolve(authData);
+            console.log(response);
         };
 
-        console.log('logining');
+        var fbLoginError = function(error){
+            fbLogged.reject(error);
+        };
+
+        $scope.facebookLogin = function() {
+            console.log('Login');
+            if (cordova.platformId == "browser") {
+                facebookConnectPlugin.browserInit('630915116944951', 'v2.3');
+            }
+            facebookConnectPlugin.login(['email'], fbLoginSuccess, fbLoginError);
+
+            fbLogged.then( function(authData) {
+                console.log('Promised');
+                return Parse.FacebookUtils.logIn(authData);
+            })
+            .then( function(userObject) {
+                facebookConnectPlugin.api('/me', null,
+                    function(response) {
+                        console.log(response);
+                        userObject.set('name', response.name);
+                        userObject.set('email', response.email);
+                        userObject.save();
+                    },
+                    function(error) {
+                        console.log(error);
+                    }
+                    );
+                if ($localStorage.chapter == null) {
+                    $state.go('app.chapter-index');
+                } else {
+                    $state.go('app.news', {chapterId: $localStorage.chapter});
+                }
+            }, function(error) {
+                console.log(error);
+            });
+        };
     })
 
     .controller('ChaptersIndexCtrl', function ($scope, ChapterService) {
@@ -82,7 +93,7 @@ angular.module('dxe.controllers', ['ngOpenFB'])
         $scope.chapters = ChapterService.all();
     })
 
-    .controller('ActionsCtrl', function ($scope, $stateParams, ngFB, ChapterService, $localStorage, $ionicLoading) {
+    .controller('ActionsCtrl', function ($scope, $stateParams, ChapterService, $localStorage, $ionicLoading) {
 
         if ($localStorage.chapter == null) {
             console.error("DXE chapterId is null");
@@ -105,29 +116,21 @@ angular.module('dxe.controllers', ['ngOpenFB'])
             window.open("https://www.facebook.com/events/" + eid + "/", '_blank', 'location=no');
         };
 
-        //TODO: just saw ngFB.getLoginStatus.. should use it
-
         function loadFeed() {
             $scope.show();
 
-            ngFB.api({
-                method: 'GET',
-                path: '/' + $scope.chapter.fbid + '/events',
-                params: {fields: "cover, description, name", limit: 30}}).then(
-                function(result) {
-                    $scope.hide();
-                    $scope.items = result.data;
-                    // Used with pull-to-refresh
-                    $scope.$broadcast('scroll.refreshComplete');
-                },
-                function (error) {
-                    //TODO: handle session expiry??
-                    //example:
-                    //{"message":"Error validating access token: Session has expired on Sunday, 12-Jul-15 02:00:00 PDT. The current time is Sunday, 12-Jul-15 02:03:48 PDT.","type":"OAuthException","code":190,"error_subcode":463}(anonymous function) @ controllers.js:175processQueue @ ionic.bundle.js:21888(anonymous function) @ ionic.bundle.js:21904$get.Scope.$eval @ ionic.bundle.js:23100$get.Scope.$digest @ ionic.bundle.js:22916(anonymous function) @ ionic.bundle.js:23139completeOutstandingRequest @ ionic.bundle.js:13604(anonymous function) @ ionic.bundle.js:13984
-                    $scope.hide();
-                    console.error(JSON.stringify(error));
-                    alert(error.message);
-                });
+            var path = $scope.chapter.fbid + "/events?fields=cover,description,name&limit=10";
+            console.log("calling " + path);
+            facebookConnectPlugin.api(path, ["public_profile"],
+                    function (result) {
+                        $scope.hide();
+                        $scope.items = result.data;
+                        $scope.$broadcast('scroll.refreshComplete');
+                    },
+                    function (error) {
+                        console.error("Error: " + JSON.stringify(error));
+                        alert("Failed: " + error);
+                    });
         }
 
         $scope.doRefresh = loadFeed;
@@ -136,7 +139,7 @@ angular.module('dxe.controllers', ['ngOpenFB'])
 
     })
 
-    .controller('NewsCtrl', function ($scope, $stateParams, ngFB, ChapterService, $localStorage, $ionicLoading) {
+    .controller('NewsCtrl', function ($scope, $stateParams, ChapterService, $localStorage, $ionicLoading) {
 
         if ($localStorage.chapter == null) {
             console.error("DXE chapterId is null");
@@ -158,23 +161,18 @@ angular.module('dxe.controllers', ['ngOpenFB'])
         function loadFeed() {
             $scope.show();
 
-            ngFB.api({
-                method: 'GET',
-                path: '/' + $scope.chapter.fbid + '/posts',
-                params: {limit: 30}}
-            ).then(
-                function(result) {
-                    $scope.hide();
-                    $scope.items = result.data;
-                    // Used with pull-to-refresh
-                    $scope.$broadcast('scroll.refreshComplete');
-                },
-                function (error) {
-                    $scope.hide();
-                    console.error(JSON.stringify(error));
-                    alert(error.message);
-                });
-
+            var path = $scope.chapter.fbid + "/posts?limit=10";
+            console.log("calling " + path);
+            facebookConnectPlugin.api(path, ["public_profile"],
+                    function (result) {
+                        $scope.hide();
+                        $scope.items = result.data;
+                        $scope.$broadcast('scroll.refreshComplete');
+                    },
+                    function (error) {
+                        console.error("Error: " + JSON.stringify(error));
+                        alert("Failed: " + error);
+                    });
         }
 
         $scope.doRefresh = loadFeed;
