@@ -12,7 +12,7 @@ angular.module('dxe.controllers', [])
         };
 
         $scope.launchWall = function(fbid) {
-            window.open("https://www.facebook.com/" + fbid + "/", '_blank', 'location=no');
+            window.open("fb://profile/" + fbid, '_system');
         };
 
         $scope.setChapter = function(cid) {
@@ -56,7 +56,7 @@ angular.module('dxe.controllers', [])
 
         $scope.facebookLogin = function() {
             console.log('Login');
-            if (cordova.platformId == "browser") {
+            if ((!window.cordova) || cordova.platformId == "browser") {
                 facebookConnectPlugin.browserInit('630915116944951', 'v2.3');
             }
             facebookConnectPlugin.login(['email'], fbLoginSuccess, fbLoginError);
@@ -113,7 +113,8 @@ angular.module('dxe.controllers', [])
         };
 
         $scope.launchEvent = function(eid) {
-            window.open("https://www.facebook.com/events/" + eid + "/", '_blank', 'location=no');
+            //window.open("https://www.facebook.com/events/" + eid + "/", '_blank', 'location=no');
+            window.open("fb://event/" + eid, '_system');
         };
 
         function loadFeed() {

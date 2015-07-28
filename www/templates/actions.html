@@ -11,7 +11,7 @@
                 on-refresh="doRefresh()">
         </ion-refresher>
 
-        <div ng-repeat="item in items" class="list card">
+        <div ng-repeat="item in items | orderBy:'-'" class="list card">
             <div class="bar bar-header">
                 <h1 class="title">{{item.name}}</h1>
             </div>

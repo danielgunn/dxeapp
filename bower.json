@@ -7,6 +7,7 @@
   "dependencies": {
     "ngstorage": "~0.3.5",
     "parse": "~1.3.4",
-    "facebook-connect-plugin": "https://cdn.rawgit.com/Wizcorp/phonegap-facebook-plugin/master/facebookConnectPlugin.js"
+    "facebook-connect-plugin": "https://cdn.rawgit.com/Wizcorp/phonegap-facebook-plugin/master/facebookConnectPlugin.js",
+    "ngCordova": "~0.1.17-alpha"
   }
 }

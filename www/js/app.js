@@ -1,4 +1,4 @@
-angular.module('dxe', ['ionic', 'dxe.controllers', 'dxe.services', 'ngStorage'])
+angular.module('dxe', ['ionic', 'dxe.controllers', 'dxe.services', 'ngStorage', 'ngCordova'])
 
     .run(function ($rootScope, $state, $ionicPlatform) {
 
@@ -18,7 +18,9 @@ angular.module('dxe', ['ionic', 'dxe.controllers', 'dxe.services', 'ngStorage'])
         });
     })
 
-    .config(function ($stateProvider, $urlRouterProvider) {
+    .config(function ($stateProvider, $urlRouterProvider, $cordovaFacebookProvider) {
+                //facebookConnectPlugin.browserInit('630915116944951', 'v2.3');
+                //$cordovaFacebookProvider.browserInit('630915116944951', 'v2.3');
 
 
         $stateProvider
