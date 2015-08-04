@@ -1,6 +1,3 @@
-# Table of Contents
-[TOC]
-
 # Introduction
 
 This is an ionic application made for the [Direct Action Everywhere](http://www.directactioneverywhere.com) activist community.  It's goal is to facilitate the organization of actions and events done by this group.
@@ -30,4 +27,5 @@ Direct Action Everywhere/Direct Action Everywhere-Info.plist:          <string>f
 
 ## Download app/binary
 
-I hope to hook this up to phonegap build soon, at which point you can download from there.  Mobile site URL will follow as that becomes ready for public release
+This app is pending release on the Google play store.
+In the mean time you can download a debug version from [phonegap](https://build.phonegap.com/apps/962836)

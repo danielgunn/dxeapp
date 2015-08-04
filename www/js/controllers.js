@@ -23,68 +23,76 @@ angular.module('dxe.controllers', [])
 
     })
 
-    .controller('LoginCtrl', function ($scope, $state, $localStorage, $ionicSideMenuDelegate ) {
+    .controller('LoginCtrl', function ($scope, $state, $localStorage, $ionicSideMenuDelegate, $cordovaFacebook ) {
 
         var drag = $ionicSideMenuDelegate.canDragContent(false);
         if (drag) {
             console.error(drag);
         }
 
-        var fbLogged = new Parse.Promise();
+        $scope.facebookLogin = function(){
 
-        var fbLoginSuccess = function(response) {
-            if (!response.authResponse){
-                fbLoginError("Cannot find the authResponse");
-                return;
+            //Browser Login
+            if(!(ionic.Platform.isIOS() || ionic.Platform.isAndroid())){
+
+                Parse.FacebookUtils.logIn(null, {
+                    success: function(user) {
+                                 console.log(user);
+                                 if (!user.existed()) {
+                                     alert("User signed up and logged in through Facebook!");
+                                 } else {
+                                     alert("User logged in through Facebook!");
+                                 }
+                             },
+                    error: function(user, error) {
+                               alert("User cancelled the Facebook login or did not fully authorize.");
+                           }
+                });
+
             }
-            var expDate = new Date(
-                new Date().getTime() + response.authResponse.expiresIn * 1000
-                ).toISOString();
+            //Native Login
+            else {
 
-            var authData = {
-                id: String(response.authResponse.userID),
-                access_token: response.authResponse.accessToken,
-                expiration_date: expDate
+                $cordovaFacebook.login(["public_profile", "email"]).then(function(success){
+
+                    console.log("success:" + JSON.stringify(success));
+
+                    var expiration_date = new Date();
+                    expiration_date.setSeconds(expiration_date.getSeconds() + success.authResponse.expiresIn);
+                    expiration_date = expiration_date.toISOString();
+
+                    var facebookAuthData = {
+                        "id": success.authResponse.userID,
+                        "access_token": success.authResponse.accessToken,
+                        "expiration_date": expiration_date
+                    };
+
+                    Parse.FacebookUtils.logIn(facebookAuthData, {
+                        success: function(user) {
+                                     console.log("heres the user:" + JSON.stringify(user));
+                                     if (!user.existed()) {
+                                         console.log("User signed up and logged in through Facebook!");
+                                     } else {
+                                         console.log("User logged in through Facebook!");
+                                     }
+
+                                     if ($localStorage.chapter == null) {
+                                         $state.go('app.chapter-index');
+                                     } else {
+                                         $state.go('app.news', {chapterId: $localStorage.chapter});
+                                     }
+                                 },
+                        error: function(user, error) {
+                                   console.log("User cancelled the Facebook login or did not fully authorize.");
+                               }
+                    });
+
+                }, function(error){
+                    console.log(error);
+                });
+
             }
-            fbLogged.resolve(authData);
-            console.log(response);
-        };
 
-        var fbLoginError = function(error){
-            fbLogged.reject(error);
-        };
-
-        $scope.facebookLogin = function() {
-            console.log('Login');
-            if ((!window.cordova) || cordova.platformId == "browser") {
-                facebookConnectPlugin.browserInit('630915116944951', 'v2.3');
-            }
-            facebookConnectPlugin.login(['email'], fbLoginSuccess, fbLoginError);
-
-            fbLogged.then( function(authData) {
-                console.log('Promised');
-                return Parse.FacebookUtils.logIn(authData);
-            })
-            .then( function(userObject) {
-                facebookConnectPlugin.api('/me', null,
-                    function(response) {
-                        console.log(response);
-                        userObject.set('name', response.name);
-                        userObject.set('email', response.email);
-                        userObject.save();
-                    },
-                    function(error) {
-                        console.log(error);
-                    }
-                    );
-                if ($localStorage.chapter == null) {
-                    $state.go('app.chapter-index');
-                } else {
-                    $state.go('app.news', {chapterId: $localStorage.chapter});
-                }
-            }, function(error) {
-                console.log(error);
-            });
         };
     })
 

@@ -19,9 +19,6 @@ angular.module('dxe', ['ionic', 'dxe.controllers', 'dxe.services', 'ngStorage', 
     })
 
     .config(function ($stateProvider, $urlRouterProvider, $cordovaFacebookProvider) {
-                //facebookConnectPlugin.browserInit('630915116944951', 'v2.3');
-                //$cordovaFacebookProvider.browserInit('630915116944951', 'v2.3');
-
 
         $stateProvider
 
@@ -94,7 +91,6 @@ angular.module('dxe', ['ionic', 'dxe.controllers', 'dxe.services', 'ngStorage', 
 
 
         // fallback route
-        //$urlRouterProvider.otherwise('/app/chapter-index');
         $urlRouterProvider.otherwise('/app/login');
 
     });
