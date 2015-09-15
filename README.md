@@ -8,17 +8,20 @@ This is an ionic application made for the [Direct Action Everywhere](http://www.
 * Change DxE chapter
 
 # Supported platforms
-iOS
-Android
-Browser
-
-# Requirements
-[Ionic](http://ionicframework.com)
-[Cordova CLI](http://cordova.apache.org/docs/en/3.5.0/guide_cli_index.md.html)
-[PhoneGap Facebook Plugin](https://github.com/Wizcorp/phonegap-facebook-plugin)
+* iOS
+* Android
+* Browser
 
 #Installation
-##Source Code
+To install, of course you can install the binary or you can build the source code, or you can see the live version hosted on [secondbull.com](http://secondbull.com/dxe)
+
+## Build Prerequisites
+* [Ionic](http://ionicframework.com)
+* [Cordova CLI](http://cordova.apache.org/docs/en/3.5.0/guide_cli_index.md.html)
+* [PhoneGap Facebook Plugin](https://github.com/Wizcorp/phonegap-facebook-plugin)
+* [Whitelist Plugin](https://github.com/apache/cordova-plugin-whitelist)
+
+##Source Code Caveats
 Currently, it seems you must add the phonegap-facebook-plugin plugin manually.
 See [ios installation guide](https://github.com/Wizcorp/phonegap-facebook-plugin/blob/master/platforms/ios/README.md)
 
@@ -32,5 +35,6 @@ Direct Action Everywhere/Direct Action Everywhere-Info.plist:          <string>f
 
 ## Download app/binary
 
-[Play Store](https://play.google.com/store/apps/details?id=com.directactioneverywhere.app)
-[phonegap build](https://build.phonegap.com/apps/962836)
+ * [Play Store](https://play.google.com/store/apps/details?id=com.directactioneverywhere.app)
+ * [phonegap build](https://build.phonegap.com/apps/962836)
+ * Apple store is pending approval
