@@ -2,6 +2,11 @@
 
 This is an ionic application made for the [Direct Action Everywhere](http://www.directactioneverywhere.com) activist community.  It's goal is to facilitate the organization of actions and events done by this group.
 
+# Features
+* Chapter events / actions list
+* Chapter news
+* Change DxE chapter
+
 # Supported platforms
 iOS
 Android
@@ -27,5 +32,5 @@ Direct Action Everywhere/Direct Action Everywhere-Info.plist:          <string>f
 
 ## Download app/binary
 
-This app is pending release on the Google play store.
-In the mean time you can download a debug version from [phonegap](https://build.phonegap.com/apps/962836)
+[Play Store](https://play.google.com/store/apps/details?id=com.directactioneverywhere.app)
+[phonegap build](https://build.phonegap.com/apps/962836)
