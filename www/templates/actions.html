@@ -11,6 +11,7 @@
                 on-refresh="doRefresh()">
         </ion-refresher>
 
+        <div ng-show="!items.length">No upcoming actions</div>
         <div ng-repeat="item in items | orderBy:'+start_time'" class="list card">
             <div class="bar bar-header">
                 <h1 class="title">{{item.name}}</h1>

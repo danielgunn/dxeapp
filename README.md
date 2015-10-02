@@ -10,7 +10,6 @@ This is an ionic application made for the [Direct Action Everywhere](http://www.
 # Supported platforms
 * iOS
 * Android
-* Browser
 
 #Installation
 To install, of course you can install the binary or you can build the source code, or you can see the live version hosted on [secondbull.com](http://secondbull.com/dxe)

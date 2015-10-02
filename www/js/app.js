@@ -18,7 +18,7 @@ angular.module('dxe', ['ionic', 'dxe.controllers', 'dxe.services', 'ngStorage', 
         });
     })
 
-    .config(function ($stateProvider, $urlRouterProvider, $cordovaFacebookProvider) {
+    .config(function ($stateProvider, $urlRouterProvider) {
 
         $stateProvider
 
