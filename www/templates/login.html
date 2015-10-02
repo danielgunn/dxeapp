@@ -14,15 +14,9 @@
     <img class="login-banner" src="./img/banner.png">
     </ion-header-bar>
 
-    <ion-content class="login" has-header="true" padding="true">
-    </ion-content>
+    <ion-content class="login" has-header="true" padding="true"> </ion-content>
 
-    <div class="tabs tabs-color-assertive" style="height:66px;">
-        <button class="button button-block button-light" ng-click="facebookLogin()">
-            <i class="icon ion-social-facebook"></i>
-            &nbsp;Login with Facebook
-            <br>
-        </button>
+    <div class="tabs tabs-color-assertive">
+        <span ng-bind="status"></span>
     </div>
-
 </ion-view>

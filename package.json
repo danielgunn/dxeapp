@@ -1,6 +1,6 @@
 {
   "name": "directactioneverywhere",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Direct Action Everywhere: Until Every Animal is free",
   "dependencies": {
     "gulp": "^3.5.6",

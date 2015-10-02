@@ -11,6 +11,7 @@
                 on-refresh="doRefresh()">
         </ion-refresher>
 
+        <div ng-show="!items.length">No recent news</div>
         <div ng-repeat="item in items" class="list card">
             <div class="item item-avatar">
                 <img ng-src="https://graph.facebook.com/{{ item.from.id }}/picture"/>

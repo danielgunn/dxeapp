@@ -1,6 +1,6 @@
 angular.module('dxe.controllers', [])
 
-    .controller('AppCtrl', function ($scope, $state, $localStorage) {
+    .controller('AppCtrl', function ($scope, $state, $ionicHistory, $localStorage) {
 
         $scope.$storage = $localStorage;
 
@@ -18,82 +18,129 @@ angular.module('dxe.controllers', [])
         $scope.setChapter = function(cid) {
             $localStorage.chapter = cid;
             console.debug("DXE chapterId set to " + $localStorage.chapter);
+            $ionicHistory.nextViewOptions({
+                historyRoot: true
+            });
             $state.go('app.news', {chapterId: cid});
         };
 
     })
 
-    .controller('LoginCtrl', function ($scope, $state, $localStorage, $ionicSideMenuDelegate, $cordovaFacebook ) {
+    .controller('LoginCtrl', function ($timeout, $ionicHistory, $ionicLoading, $ionicPlatform, $scope, $state, $localStorage, $ionicSideMenuDelegate, $cordovaFacebook ) {
+
+        $scope.show = function() {
+            $ionicLoading.show({
+                content: 'Loading...'
+            });
+        };
+
+        $scope.show();
 
         var drag = $ionicSideMenuDelegate.canDragContent(false);
         if (drag) {
             console.error(drag);
         }
 
-        $scope.facebookLogin = function(){
+        $scope.status = "Loading...";
+        
+        $scope.parseLogin = function(userID, accessToken, expiresIn) {
+            $scope.status = "Logging_in...";
+            console.debug("doing parseLogin");
+            console.debug(JSON.stringify(userID));
+            console.debug(JSON.stringify(accessToken));
+            console.debug(JSON.stringify(expiresIn));
 
-            //Browser Login
-            if(!(ionic.Platform.isIOS() || ionic.Platform.isAndroid())){
+            var expiration_date = new Date();
+            expiration_date.setSeconds(expiration_date.getSeconds() + expiresIn);
+            expiration_date = expiration_date.toISOString();
 
-                Parse.FacebookUtils.logIn(null, {
-                    success: function(user) {
-                                 console.log(user);
-                                 if (!user.existed()) {
-                                     alert("User signed up and logged in through Facebook!");
-                                 } else {
-                                     alert("User logged in through Facebook!");
-                                 }
-                             },
-                    error: function(user, error) {
-                               alert("User cancelled the Facebook login or did not fully authorize.");
-                           }
-                });
+            var facebookAuthData = {
+                "id": userID,
+                "access_token": accessToken,
+                "expiration_date": expiration_date
+            };
 
-            }
-            //Native Login
-            else {
+            console.debug("heres the authData: " + JSON.stringify(facebookAuthData));
 
-                $cordovaFacebook.login(["public_profile", "email"]).then(function(success){
+            Parse.FacebookUtils.logIn(facebookAuthData, {
+                success: function(user) {
+                             console.debug("heres the user:" + JSON.stringify(user));
+                             if (!user.existed()) {
+                                 console.debug("User signed up and logged in through Facebook!");
+                             } else {
+                                 console.debug("User logged in through Facebook!");
+                             }
+                             $scope.status = "Connected";
+                             $ionicHistory.nextViewOptions({
+                                 historyRoot: true
+                             });
 
-                    console.log("success:" + JSON.stringify(success));
-
-                    var expiration_date = new Date();
-                    expiration_date.setSeconds(expiration_date.getSeconds() + success.authResponse.expiresIn);
-                    expiration_date = expiration_date.toISOString();
-
-                    var facebookAuthData = {
-                        "id": success.authResponse.userID,
-                        "access_token": success.authResponse.accessToken,
-                        "expiration_date": expiration_date
-                    };
-
-                    Parse.FacebookUtils.logIn(facebookAuthData, {
-                        success: function(user) {
-                                     console.log("heres the user:" + JSON.stringify(user));
-                                     if (!user.existed()) {
-                                         console.log("User signed up and logged in through Facebook!");
-                                     } else {
-                                         console.log("User logged in through Facebook!");
-                                     }
-
-                                     if ($localStorage.chapter == null) {
-                                         $state.go('app.chapter-index');
-                                     } else {
-                                         $state.go('app.news', {chapterId: $localStorage.chapter});
-                                     }
-                                 },
-                        error: function(user, error) {
-                                   console.log("User cancelled the Facebook login or did not fully authorize.");
-                               }
-                    });
-
-                }, function(error){
-                    console.log(error);
-                });
-
-            }
+                             if ($localStorage.chapter == null) {
+                                 $state.go('app.chapter-index');
+                             } else {
+                                 $state.go('app.news', {chapterId: $localStorage.chapter});
+                             }
+                         },
+                error: function(user, error) {
+                           console.log("User cancelled the Facebook login or did not fully authorize.");
+                           console.log(JSON.stringify(user));
+                           console.log(JSON.stringify(error));
+                           $scope.status = "Parse_logIn_error:" + error.messageMessage;
+                       }
+            });
 
         };
+
+        $scope.freshLogin = function() {
+            $scope.status = "1st_connect...";
+            console.debug("trying fresh login");
+            /* var facebookAuthData = {
+                "id":               success.authResponse.userID,
+                "access_token":     success.authResponse.accessToken,
+                "expiration_date":  expiration_date
+            };
+            */
+            $cordovaFacebook.login(["public_profile"]).then(function(success){
+
+                console.log("success:" + JSON.stringify(success));
+
+                $scope.parseLogin(success.authResponse.userID, success.authResponse.accessToken, success.authResponse.expiresIn);
+            }, function(error) {
+                console.log("failure in login: " + JSON.stringify(error));
+                $scope.status = "login_error:" + error.errorMessage;
+            });
+        }
+
+        $scope.facebookLogin = function() {
+            $scope.status = "Connecting...";
+            console.debug("facebookLogin called");
+            $cordovaFacebook.getLoginStatus().then(function(response){
+                console.debug("Already logged in!");
+                console.debug("response:");
+                console.debug(JSON.stringify(response));
+
+                if (response.status == "connected") {
+                    console.debug("authResponse:");
+                    console.debug(JSON.stringify(response.authResponse));
+                    $scope.parseLogin(response.authResponse.userID, response.authResponse.accessToken, response.authResponse.expiresIn);
+                } else {
+                    $scope.freshLogin();
+                }
+            }, function(error){
+                console.log(JSON.stringify(error));
+                $scope.status = "status_error:" + error.messageMessage;
+                $scope.freshLogin();
+            });
+        }
+
+        //HACK just to get it to call after page load.. 
+        $timeout(function() {
+            $ionicPlatform.ready(function () {
+                console.debug("initial call to facebookLogin");
+                $scope.facebookLogin();
+            });
+        });
+
     })
 
     .controller('ChaptersIndexCtrl', function ($scope, ChapterService) {
@@ -121,7 +168,6 @@ angular.module('dxe.controllers', [])
         };
 
         $scope.launchEvent = function(eid) {
-            //window.open("https://www.facebook.com/events/" + eid + "/", '_blank', 'location=no');
             window.open("fb://event/" + eid, '_system');
         };
 
