@@ -26,26 +26,54 @@ angular.module('dxe.controllers', [])
 
     })
 
-    .controller('LoginCtrl', function ($timeout, $ionicHistory, $ionicLoading, $ionicPlatform, $scope, $state, $localStorage, $ionicSideMenuDelegate, $cordovaFacebook ) {
+    .controller('LoginCtrl', function ($ionicPopup, $ionicHistory, $ionicLoading, $ionicPlatform, $scope, $state, $localStorage, $ionicSideMenuDelegate, $cordovaFacebook ) {
 
-        $scope.show = function() {
+        $scope.progress = "none";
+
+        $scope.updateProgress = function(status) {
+            console.debug("progress:" + status);
+            $scope.progress = status;
             $ionicLoading.show({
-                hideOnStateChange: true
+                hideOnStateChange: true,
+                template: "<BR><p>" + status + "</p>"
             });
+        }
+
+        $scope.hideSpinner = function() {
+            $ionicLoading.hide();
         };
 
-        $scope.show();
+        $scope.$on('$ionicView.enter', function(){
+            console.debug("view enter");
+            $scope.updateProgress("Initializing...");
+        });
 
         var drag = $ionicSideMenuDelegate.canDragContent(false);
         if (drag) {
             console.error(drag);
         }
 
-        $scope.status = "Loading...";
+        // An alert dialog
+        $scope.loginFailed = function(error) {
+            console.log("loginFailed:" + JSON.stringify(error));
+            $scope.hideSpinner();
+
+            var alertPopup = $ionicPopup.alert({
+                title: 'Fail!',
+                template: "Why? '" + error.errorMessage + " (" + error.errorCode + ")'<BR>When? '" + $scope.progress + "'",
+                okText: "Let's try again"
+            });
+
+            alertPopup.then(function(res) {
+                $scope.freshLogin();
+            }, function(fail) {
+                console.log("alertPopup error: " + JSON.stringify(fail));
+            });
+        };
         
         $scope.parseLogin = function(userID, accessToken, expiresIn) {
-            $scope.status = "Logging_in...";
-            console.debug("doing parseLogin");
+            console.debug("parseLogin called");
+            $scope.updateProgress("Logging in...");
 
             var expiration_date = new Date();
             expiration_date.setSeconds(expiration_date.getSeconds() + expiresIn);
@@ -64,7 +92,7 @@ angular.module('dxe.controllers', [])
                              } else {
                                  console.debug("User logged in through Facebook!");
                              }
-                             $scope.status = "Connected";
+                             $scope.updateProgress("Opening page..");
                              $ionicHistory.nextViewOptions({
                                  historyRoot: true
                              });
@@ -76,17 +104,16 @@ angular.module('dxe.controllers', [])
                              }
                          },
                 error: function(user, error) {
-                           console.log("User cancelled the Facebook login or did not fully authorize.");
-                           console.log(JSON.stringify(error));
-                           $scope.status = "Parse_logIn_error:" + error.messageMessage;
+                           console.log("Parse.FacebookUtils.logIn:" + JSON.stringify(error));
+                           console.log(JSON.stringify(user));
+                           $scope.loginFailed(error);
                        }
             });
 
         };
 
         $scope.freshLogin = function() {
-            $scope.status = "1st_connect...";
-            console.debug("trying fresh login");
+            $scope.updateProgress("Establishing new connection...");
             /* var facebookAuthData = {
                 "id":               success.authResponse.userID,
                 "access_token":     success.authResponse.accessToken,
@@ -99,40 +126,39 @@ angular.module('dxe.controllers', [])
 
                 $scope.parseLogin(success.authResponse.userID, success.authResponse.accessToken, success.authResponse.expiresIn);
             }, function(error) {
-                console.log("failure in login: " + JSON.stringify(error));
-                $scope.status = "login_error:" + error.errorMessage;
+                console.log("cordovaFacebook.login error: " + JSON.stringify(error));
+                $scope.loginFailed(error);
             });
         }
 
         $scope.facebookLogin = function() {
-            $scope.status = "Connecting...";
-            console.debug("facebookLogin called");
+            $scope.updateProgress("Checking login status..");
             $cordovaFacebook.getLoginStatus().then(function(response){
                 console.debug("Already logged in!");
                 console.debug("response:");
                 console.debug(JSON.stringify(response));
 
                 if (response.status == "connected") {
-                    console.debug("authResponse:");
                     $scope.parseLogin(response.authResponse.userID, response.authResponse.accessToken, response.authResponse.expiresIn);
                 } else {
                     $scope.freshLogin();
                 }
             }, function(error){
-                console.log(JSON.stringify(error));
-                $scope.status = "status_error:" + error.messageMessage;
-                $scope.freshLogin();
+                console.log("facebookLogin fail: " + JSON.stringify(error));
+                $scope.loginFailed(error);
             });
         }
 
-        //HACK just to get it to call after page load.. 
-        $timeout(function() {
+        $scope.$on('$ionicView.afterEnter', function(){
+            console.debug("view enter");
+            $scope.updateProgress("Initializing...");
+
             $ionicPlatform.ready(function () {
                 console.debug("initial call to facebookLogin");
                 $scope.facebookLogin();
             });
-        });
 
+        });
     })
 
     .controller('ChaptersIndexCtrl', function ($scope, ChapterService) {
